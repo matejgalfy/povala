@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="povala_app.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:povala_app.Views"
+    Title="povala_app">
+
+    <TabBar>
+        <ShellContent
+            Title="Map Page"
+            Icon="map_icon.png"
+            ContentTemplate="{DataTemplate views:MapPage}"
+            Route="MapPage" />
+        <ShellContent
+            Title="Profile Page"
+            Icon="profile_icon.png"
+            ContentTemplate="{DataTemplate views:ProfilePage}"
+            Route="ProfilePage" />
+    </TabBar>
+
+
+</Shell>
