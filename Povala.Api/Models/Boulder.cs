@@ -5,7 +5,7 @@ namespace Povala.Api.Models
 {
     public class Boulder
     {
-        public string Id { get; set; } = string.Empty;
+        public int Id { get; set; }
         public string GymId { get; set; } = string.Empty;
         
         [JsonIgnore] // To avoid circular reference

@@ -1,6 +1,4 @@
 <Solution>
-  <Project Path="../Povala.Api/Povala.Api.csproj" />
-  <Project Path="povala-app.csproj">
-    <Deploy Solution="Debug|*" />
-  </Project>
+  <Project Path="povala-app/povala-app.csproj" />
+  <Project Path="Povala.Api/Povala.Api.csproj" />
 </Solution>
