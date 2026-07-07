@@ -106,6 +106,8 @@ namespace Povala.Api.Controllers
             }
 
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userIdStr == null)
+                return Unauthorized();
             var user = await _userManager.FindByIdAsync(userIdStr);
 
             bool isAdmin = user?.Role == AppRoles.Admin;
