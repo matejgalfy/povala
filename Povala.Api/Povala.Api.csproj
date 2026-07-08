@@ -20,4 +20,8 @@
     <PackageReference Include="Scalar.AspNetCore" Version="2.16.10" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Povala.Shared\Povala.Shared.csproj" />
+  </ItemGroup>
+
 </Project>

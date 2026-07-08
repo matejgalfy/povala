@@ -77,6 +77,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\Povala.Shared\Povala.Shared.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <Compile Update="Views\MapPage.xaml.cs">
 	    <DependentUpon>MapPage.xaml</DependentUpon>
 	  </Compile>
