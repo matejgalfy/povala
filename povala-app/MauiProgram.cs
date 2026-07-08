@@ -22,6 +22,7 @@ namespace povala_app
                     client.BaseAddress = new Uri("http://10.0.2.2:5000");
                 });
 
+            builder.Services.AddSingleton<AuthApiService>();
             builder.Services.AddTransient<RegisterViewModel>();
             builder.Services.AddTransient<RegisterPage>();
 

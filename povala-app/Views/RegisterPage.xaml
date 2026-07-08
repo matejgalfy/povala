@@ -20,6 +20,9 @@
         <Entry Placeholder="Name" 
                Text="{Binding Name}" />
 
+        <Entry Placeholder="Email" 
+               Text="{Binding Email}" />
+
         <Entry Placeholder="Password" 
                IsPassword="True" 
                Text="{Binding Password}" />
