@@ -20,6 +20,7 @@ namespace Povala.Api.Controllers
             _userManager = userManager;
         }
 
+
         [HttpGet("{id}")]
         public async Task<ActionResult<Project>> GetProject(int id)
         {
