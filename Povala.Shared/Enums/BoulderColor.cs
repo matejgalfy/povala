@@ -1,5 +1,5 @@
-﻿namespace Povala.Api.Models.Enums
-{
+﻿namespace Povala.Shared.Enums;
+
     public enum BoulderColor
     {
         White,
@@ -10,4 +10,3 @@
         Black,
         Purple
     }
-}

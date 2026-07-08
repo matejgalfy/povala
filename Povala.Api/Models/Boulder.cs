@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using Povala.Api.Models.Enums;
+﻿using Povala.Shared.Enums;
 
 namespace Povala.Api.Models
 {
