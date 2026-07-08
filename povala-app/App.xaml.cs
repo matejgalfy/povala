@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using povala_app.Views;
 
 namespace povala_app
 {
@@ -12,7 +12,22 @@ namespace povala_app
 
         protected override Window CreateWindow(IActivationState? activationState)
         {
-            return new Window(new AppShell());
+            bool isUserLoggedIn = false;
+
+            Page initialPage;
+            if (isUserLoggedIn)
+            {
+                initialPage = new AppShell();
+            }
+            else
+            {
+                var serviceProvider = activationState?.Context.Services;
+                var registerPage = serviceProvider?.GetRequiredService<RegisterPage>();
+
+                initialPage = new NavigationPage(registerPage);
+            }
+
+            return new Window(initialPage);
         }
     }
 }
