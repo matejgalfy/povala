@@ -24,7 +24,10 @@ builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-var jwtSecret = "9NJe7qvo23ct0pcNpVw1AZy8CC9p1eAETvilpEWPjd8";
+string? jwtSecret = builder.Configuration["JwtSettings:Secret"];
+if (jwtSecret == null)
+    throw new Exception("jwtSeceret is null");
+
 var key = Encoding.ASCII.GetBytes(jwtSecret);
 
 builder.Services.AddAuthentication(options =>
