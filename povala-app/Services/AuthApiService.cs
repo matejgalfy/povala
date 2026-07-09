@@ -1,5 +1,6 @@
-﻿using System.Net.Http.Json;
+using System.Net.Http.Json;
 using Povala.Shared.DTOs.Auth;
+using System.Diagnostics;
 
 public class AuthApiService
 {
@@ -12,24 +13,14 @@ public class AuthApiService
 
     public async Task<bool> RegisterAsync(RegisterDto registerData)
     {
-        try
+        var response = await _httpClient.PostAsJsonAsync("/api/auth/register", registerData);
+
+        if (response.IsSuccessStatusCode)
         {
-            var response = await _httpClient.PostAsJsonAsync("/api/auth/register", registerData);
-
-            if (response.IsSuccessStatusCode)
-            {
-                return true;
-            }
-
-            var errorMessage = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"Backend registration failed: {errorMessage}");
-
-            return false;
+            return true;
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Exception caught: {ex.Message}");
-            return false;
-        }
+
+        var errorMessage = await response.Content.ReadAsStringAsync();
+        throw new Exception($"Status: {response.StatusCode}, Body: {errorMessage}");
     }
 }
