@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
@@ -28,7 +28,7 @@ namespace Povala.Api.Controllers
         {
             var newUser = new User
             {
-                UserName = dto.Name,
+                UserName = dto.Email,
                 Email = dto.Email,
                 Name = dto.Name,
                 Role = AppRoles.User
