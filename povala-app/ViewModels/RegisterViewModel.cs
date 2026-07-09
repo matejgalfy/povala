@@ -1,7 +1,8 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using Povala.Shared.DTOs.Auth;
 
@@ -31,40 +32,57 @@ namespace povala_app.ViewModels
         [RelayCommand]
         async Task RegisterAsync()
         {
-            HasError = false;
+            try
+            {
+                HasError = false;
 
-            if (Password.Length < 8)
+                if (Password.Length < 8)
+                {
+                    HasError = true;
+                    ErrorMessage = "Password must be at least 8 characters!";
+                    return;
+                }
+
+                if (Password != RepeatPassword)
+                {
+                    HasError = true;
+                    ErrorMessage = "Password and repeat password must match";
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(Name))
+                {
+                    HasError = true;
+                    ErrorMessage = "Name can not be empty";
+                    return;
+                }
+
+                string? error = await _authApiService.RegisterAsync(new RegisterDto()
+                {
+                    Name = Name,
+                    Password = Password,
+                    Email = Email
+                });
+
+                var page = Application.Current?.Windows[0].Page;
+                if (page == null)
+                {
+                    return;
+                }
+
+                if (error != null)
+                {
+                    HasError = true;
+                    ErrorMessage = error;
+                }
+                else
+                    await page.DisplayAlertAsync("Success", "You can now log in", "OK");
+            }
+            catch (Exception ex)
             {
                 HasError = true;
-                ErrorMessage = "Password must be at least 8 characters!";
-                return;
+                ErrorMessage = $"Unexpected error: {ex.Message}";
             }
-
-            if (Password != RepeatPassword)
-            {
-                HasError = true;
-                ErrorMessage = "Password and repeat password must match";
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(Name))
-            {
-                HasError = true;
-                ErrorMessage = "Name can not be empty";
-                return;
-            }
-
-            bool success = await _authApiService.RegisterAsync(new RegisterDto()
-            {
-                Name = Name,
-                Password = Password,
-                Email = Email
-            });
-
-            if (!success)
-                await Shell.Current.DisplayAlertAsync("Error", "Please try again", "OK");
-            else
-                await Shell.Current.DisplayAlertAsync("Succes", "You can now log in", "OK");
         }
     }
 }

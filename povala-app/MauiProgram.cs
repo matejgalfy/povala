@@ -19,7 +19,7 @@ namespace povala_app
                 })
                 .Services.AddHttpClient("PovalaApi", client =>
                 {
-                    client.BaseAddress = new Uri("http://10.0.2.2:5000");
+                    client.BaseAddress = new Uri("http://10.0.2.2:5058");
                 });
 
             builder.Services.AddSingleton<AuthApiService>();
