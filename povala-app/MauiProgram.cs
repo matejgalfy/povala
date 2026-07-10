@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using povala_app.Services;
 using povala_app.ViewModels;
 using povala_app.Views;
 
@@ -25,6 +26,11 @@ namespace povala_app
             builder.Services.AddSingleton<AuthApiService>();
             builder.Services.AddTransient<RegisterViewModel>();
             builder.Services.AddTransient<RegisterPage>();
+
+            builder.Services.AddTransient<LoginViewModel>();
+            builder.Services.AddTransient<LoginPage>();
+
+            builder.Services.AddTransient<MapPage>();
 
 #if DEBUG
             builder.Logging.AddDebug();
