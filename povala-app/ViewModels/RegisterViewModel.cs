@@ -1,9 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
+using povala_app.Services;
+using povala_app.Views;
 using Povala.Shared.DTOs.Auth;
 
 namespace povala_app.ViewModels
@@ -83,6 +81,16 @@ namespace povala_app.ViewModels
                 HasError = true;
                 ErrorMessage = $"Unexpected error: {ex.Message}";
             }
+        }
+
+        [RelayCommand]
+        async Task GoToLoginAsync()
+        {
+            LoginPage? loginPage = Application.Current?.Handler?.MauiContext?.Services.GetService<LoginPage>();
+            if (loginPage == null)
+                return;
+
+            await Application.Current!.Windows[0].Page!.Navigation.PushAsync(loginPage);
         }
     }
 }
