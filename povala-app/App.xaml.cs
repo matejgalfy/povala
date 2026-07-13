@@ -17,7 +17,7 @@ namespace povala_app
             Page initialPage;
             if (isUserLoggedIn)
             {
-                initialPage = new AppShell();
+                initialPage = new UserShell();
             }
             else
             {

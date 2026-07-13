@@ -74,6 +74,11 @@
 
 	<ItemGroup>
 	  <Folder Include="Models\" />
+	  <Folder Include="ViewModels\Admin\" />
+	  <Folder Include="ViewModels\GymOwner\" />
+	  <Folder Include="ViewModels\User\" />
+	  <Folder Include="Views\Admin\" />
+	  <Folder Include="Views\GymOwner\" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -81,19 +86,22 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Views\MapPage.xaml.cs">
+	  <Compile Update="Views\UserShell.xaml.cs">
+	    <DependentUpon>UserShell.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\User\MapPage.xaml.cs">
 	    <DependentUpon>MapPage.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="Views\LoginPage.xaml">
+	  <MauiXaml Update="Views\Auth\LoginPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\ProfilePage.xaml">
+	  <MauiXaml Update="Views\User\ProfilePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\RegisterPage.xaml">
+	  <MauiXaml Update="Views\Auth\RegisterPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>

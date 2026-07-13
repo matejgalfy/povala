@@ -2,6 +2,8 @@
 using povala_app.Services;
 using povala_app.ViewModels;
 using povala_app.Views;
+using LoginViewModel = povala_app.ViewModels.Auth.LoginViewModel;
+using RegisterViewModel = povala_app.ViewModels.Auth.RegisterViewModel;
 
 
 namespace povala_app

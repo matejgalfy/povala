@@ -1,4 +1,4 @@
-using povala_app.ViewModels;
+using povala_app.ViewModels.Auth;
 
 namespace povala_app.Views;
 

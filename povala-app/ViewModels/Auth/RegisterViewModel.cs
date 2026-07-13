@@ -4,7 +4,7 @@ using povala_app.Services;
 using povala_app.Views;
 using Povala.Shared.DTOs.Auth;
 
-namespace povala_app.ViewModels
+namespace povala_app.ViewModels.Auth
 {
     public partial class RegisterViewModel : ObservableObject
     {

@@ -1,10 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Povala.Shared.DTOs.Auth;
 using povala_app.Services;
 using povala_app.Views;
+using Povala.Shared.DTOs.Auth;
 
-namespace povala_app.ViewModels
+namespace povala_app.ViewModels.Auth
 {
     public partial class LoginViewModel : ObservableObject
     {
