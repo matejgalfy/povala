@@ -44,7 +44,7 @@ namespace povala_app.ViewModels.Auth
                 return;
             }
 
-            string? error = await _authApiService.LoginAsync(new LoginDto
+            (string? error, string? role) = await _authApiService.LoginAsync(new LoginDto
             {
                 Email = Email,
                 Password = Password
@@ -57,11 +57,18 @@ namespace povala_app.ViewModels.Auth
             }
             else
             {
-                MapPage? mapPage = Application.Current?.Handler?.MauiContext?.Services.GetService<MapPage>();
-                if (mapPage == null)
-                    return;
+                Application.Current!.Windows[0].Page = role switch
+                {
+                    "Admin" => new AdminShell(),
+                    "GymOwner" => new GymOwnerShell(),
+                    _ => new UserShell()
+                };
 
-                await Application.Current!.Windows[0].Page!.Navigation.PushAsync(mapPage);
+                //MapPage? mapPage = Application.Current?.Handler?.MauiContext?.Services.GetService<MapPage>();
+                //if (mapPage == null)
+                //    return;
+
+                //await Application.Current!.Windows[0].Page!.Navigation.PushAsync(mapPage);
             }
         }
 

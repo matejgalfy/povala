@@ -1,6 +1,8 @@
-using System.Net.Http.Json;
 using Povala.Shared.DTOs.Auth;
 using povala_app.Services.Helper;
+using System.Net.Http.Json;
+using System.Security.Claims;
+using System.Text.Json;
 
 namespace povala_app.Services;
 
@@ -28,11 +30,11 @@ public class AuthApiService
 
             if (response.Content.Headers.ContentType?.MediaType == "application/json")
             {
-                var options = new System.Text.Json.JsonSerializerOptions
+                var options = new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
                 };
-                var errors = System.Text.Json.JsonSerializer.Deserialize<List<IdentityErrorResponse>>(errorContent, options);
+                var errors = JsonSerializer.Deserialize<List<IdentityErrorResponse>>(errorContent, options);
 
                 if (errors != null && errors.Count > 0)
                 {
@@ -52,39 +54,49 @@ public class AuthApiService
         }
     }
 
-    public async Task<string?> LoginAsync(LoginDto loginData)
+    public async Task<(string? Error, string? Role)> LoginAsync(LoginDto loginData)
     {
         try
         {
             var response = await _httpClient.PostAsJsonAsync("/api/auth/login", loginData);
             if (response.IsSuccessStatusCode)
             {
-                return null;
+                var json = await response.Content.ReadFromJsonAsync<JsonElement>();
+                var token = json.GetProperty("Token").GetString();
+
+                var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
+                var jwt = handler.ReadJwtToken(token);
+                var role = jwt.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+
+                await SecureStorage.SetAsync("auth_token", token!);
+                await SecureStorage.SetAsync("user_role", role!);
+
+                return (null, role);
             }
             var errorContent = await response.Content.ReadAsStringAsync();
             if (response.Content.Headers.ContentType?.MediaType == "application/json")
             {
-                var options = new System.Text.Json.JsonSerializerOptions
+                var options = new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
                 };
-                var errors = System.Text.Json.JsonSerializer.Deserialize<List<IdentityErrorResponse>>(errorContent, options);
+                var errors = JsonSerializer.Deserialize<List<IdentityErrorResponse>>(errorContent, options);
 
                 if (errors != null && errors.Count > 0)
                 {
-                    return string.Join("\n", errors.Select(e => e.Description));
+                    return (string.Join("\n", errors.Select(e => e.Description)), null);
                 }
             }
             if (!string.IsNullOrWhiteSpace(errorContent))
             {
-                return errorContent;
+                return (errorContent, null);
             }
             
-            return "Login failed.";
+            return ("Login failed.", null);
         }
         catch (Exception ex)
         {
-            return ex.Message;
+            return (ex.Message, null);
         }
     }
 }

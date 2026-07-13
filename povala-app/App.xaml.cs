@@ -12,21 +12,24 @@ namespace povala_app
 
         protected override Window CreateWindow(IActivationState? activationState)
         {
-            bool isUserLoggedIn = false;
+            var savedRole = SecureStorage.GetAsync("user_role").Result;
+            var savedToken = SecureStorage.GetAsync("auth_token").Result;
 
             Page initialPage;
-            if (isUserLoggedIn)
+            if (!string.IsNullOrEmpty(savedToken) && !string.IsNullOrEmpty(savedRole))
             {
-                initialPage = new UserShell();
+                initialPage = savedRole switch
+                {
+                    "Admin" => new AdminShell(),
+                    "GymOwner" => new GymOwnerShell(),
+                    _ => new UserShell()
+                };
             }
             else
             {
-                var serviceProvider = activationState?.Context.Services;
-                var registerPage = serviceProvider?.GetRequiredService<RegisterPage>();
-
-                initialPage = new NavigationPage(registerPage);
+                var loginPage = activationState?.Context.Services.GetRequiredService<LoginPage>();
+                initialPage = new NavigationPage(loginPage);
             }
-
             return new Window(initialPage);
         }
     }
