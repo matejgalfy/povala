@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Povala.Api.Constants;
+using Povala.Shared.Constants;
+
 namespace Povala.Api.Models
 {
     public class User : IdentityUser<int>

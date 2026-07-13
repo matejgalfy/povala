@@ -24,4 +24,8 @@
     <ProjectReference Include="..\Povala.Shared\Povala.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Constants\" />
+  </ItemGroup>
+
 </Project>

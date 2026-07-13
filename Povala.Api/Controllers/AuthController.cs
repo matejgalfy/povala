@@ -4,8 +4,8 @@ using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using Povala.Api.Constants;
 using Povala.Api.Models;
+using Povala.Shared.Constants;
 using Povala.Shared.DTOs.Auth;
 
 namespace Povala.Api.Controllers

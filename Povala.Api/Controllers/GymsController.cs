@@ -2,10 +2,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Povala.Api.Constants;
 using Povala.Api.Data;
 using Povala.Api.Models;
 using System.Security.Claims;
+using Povala.Shared.Constants;
 
 namespace Povala.Api.Controllers
 {
