@@ -1,6 +1,6 @@
 namespace povala_app.Views;
 
-public partial class AdminShell : ContentPage
+public partial class AdminShell : Shell
 {
 	public AdminShell()
 	{

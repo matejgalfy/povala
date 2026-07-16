@@ -57,18 +57,16 @@ namespace povala_app.ViewModels.Auth
             }
             else
             {
-                Application.Current!.Windows[0].Page = role switch
+                // 
+                MainThread.BeginInvokeOnMainThread(() =>
                 {
-                    "Admin" => new AdminShell(),
-                    "GymOwner" => new GymOwnerShell(),
-                    _ => new UserShell()
-                };
-
-                //MapPage? mapPage = Application.Current?.Handler?.MauiContext?.Services.GetService<MapPage>();
-                //if (mapPage == null)
-                //    return;
-
-                //await Application.Current!.Windows[0].Page!.Navigation.PushAsync(mapPage);
+                    Application.Current!.Windows[0].Page = role switch
+                    {
+                        "Admin" => new AdminShell(),
+                        "GymOwner" => new GymOwnerShell(),
+                        _ => new UserShell()
+                    };
+                });
             }
         }
 

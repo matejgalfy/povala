@@ -78,7 +78,6 @@
 	  <Folder Include="ViewModels\Admin\" />
 	  <Folder Include="ViewModels\GymOwner\" />
 	  <Folder Include="ViewModels\User\" />
-	  <Folder Include="Views\GymOwner\" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -105,6 +104,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\GymOwnerShell.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\GymOwner\GymOwnerPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\User\ProfilePage.xaml">

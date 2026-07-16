@@ -2,6 +2,7 @@
 using povala_app.Services;
 using povala_app.ViewModels;
 using povala_app.Views;
+using povala_app.Views.Admin;
 using LoginViewModel = povala_app.ViewModels.Auth.LoginViewModel;
 using RegisterViewModel = povala_app.ViewModels.Auth.RegisterViewModel;
 
@@ -33,6 +34,10 @@ namespace povala_app
             builder.Services.AddTransient<LoginPage>();
 
             builder.Services.AddTransient<MapPage>();
+            builder.Services.AddTransient<ProfilePage>();
+            builder.Services.AddTransient<AdminPage>();
+
+
 
 #if DEBUG
             builder.Logging.AddDebug();
