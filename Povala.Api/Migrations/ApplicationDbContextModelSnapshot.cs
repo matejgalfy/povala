@@ -181,30 +181,12 @@ namespace Povala.Api.Migrations
                     b.Property<int>("Difficulty")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("GymId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
                     b.ToTable("Boulders");
-                });
-
-            modelBuilder.Entity("Povala.Api.Models.Gym", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Gyms");
                 });
 
             modelBuilder.Entity("Povala.Api.Models.Project", b =>
@@ -249,9 +231,6 @@ namespace Povala.Api.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("TEXT");
-
-                    b.Property<int?>("ManagedGymId")
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()
