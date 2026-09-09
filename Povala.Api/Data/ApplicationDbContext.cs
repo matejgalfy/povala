@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Povala.Api.Models;
@@ -12,7 +12,6 @@ namespace Povala.Api.Data
         {
         }
 
-        public DbSet<Gym> Gyms { get; set; }
         public DbSet<Boulder> Boulders { get; set; }
         public DbSet<Ascent> Ascents { get; set; }
         public DbSet<Project> Projects { get; set; }
