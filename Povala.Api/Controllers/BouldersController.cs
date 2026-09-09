@@ -35,16 +35,13 @@ namespace Povala.Api.Controllers
 
 
         [HttpPost]
-        [Authorize(Roles = AppRoles.GymOwner)]
+        [Authorize(Roles = AppRoles.Admin)]
         // maybe change type of input parameter to CreateBoulderDTO later
         public async Task<ActionResult<Boulder>> CreateBoulder(Boulder boulder) 
         {
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userIdStr == null)
                 return Unauthorized();
-            var user = await _userManager.FindByIdAsync(userIdStr);
-            if (user?.ManagedGymId != boulder.GymId)
-                return Forbid();
 
             _context.Boulders.Add(boulder);
             await _context.SaveChangesAsync();
@@ -53,7 +50,7 @@ namespace Povala.Api.Controllers
 
 
         [HttpPut("{id}")]
-        [Authorize(Roles = AppRoles.GymOwner)]
+        [Authorize(Roles = AppRoles.Admin)]
         public async Task<IActionResult> UpdateBoulder(int id, Boulder boulder)
         {
             if (id != boulder.Id)
@@ -62,9 +59,6 @@ namespace Povala.Api.Controllers
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userIdStr == null)
                 return Unauthorized();
-            var user = await _userManager.FindByIdAsync(userIdStr);
-            if (user?.ManagedGymId != boulder.GymId)
-                return Forbid();
 
             _context.Entry(boulder).State = EntityState.Modified;
             try
@@ -87,7 +81,7 @@ namespace Povala.Api.Controllers
 
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = AppRoles.GymOwner)]
+        [Authorize(Roles = AppRoles.Admin)]
         public async Task<IActionResult> DeleteBoulder(int id)
         {
             var boulder = await _context.Boulders.FirstOrDefaultAsync(b => b.Id == id);
@@ -97,9 +91,6 @@ namespace Povala.Api.Controllers
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userIdStr == null)
                 return Unauthorized();
-            var user = await _userManager.FindByIdAsync(userIdStr);
-            if (user?.ManagedGymId != boulder.GymId)
-                return Forbid();
 
             boulder.IsActive = false;
             await _context.SaveChangesAsync();

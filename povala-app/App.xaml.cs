@@ -7,7 +7,7 @@ namespace povala_app
         public App()
         {
             InitializeComponent();
-            //Current?.UserAppTheme = AppTheme.Dark;
+            Current?.UserAppTheme = AppTheme.Dark;
         }
 
         protected override Window CreateWindow(IActivationState? activationState)

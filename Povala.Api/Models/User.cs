@@ -8,6 +8,5 @@ namespace Povala.Api.Models
         public string Name { get; set; } = string.Empty;
 
         public string Role { get; set; } = AppRoles.User;
-        public int? ManagedGymId { get; set; }
     }
 }

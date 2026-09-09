@@ -62,7 +62,7 @@ public class AuthApiService
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadFromJsonAsync<JsonElement>();
-                var token = json.GetProperty("Token").GetString();
+                var token = json.GetProperty("token").GetString();
 
                 var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
                 var jwt = handler.ReadJwtToken(token);
