@@ -57,13 +57,11 @@ namespace povala_app.ViewModels.Auth
             }
             else
             {
-                // 
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
                     Application.Current!.Windows[0].Page = role switch
                     {
                         "Admin" => new AdminShell(),
-                        "GymOwner" => new GymOwnerShell(),
                         _ => new UserShell()
                     };
                 });

@@ -1,4 +1,4 @@
-﻿using povala_app.Views;
+using povala_app.Views;
 
 namespace povala_app
 {
@@ -21,7 +21,6 @@ namespace povala_app
                 initialPage = savedRole switch
                 {
                     "Admin" => new AdminShell(),
-                    "GymOwner" => new GymOwnerShell(),
                     _ => new UserShell()
                 };
             }
