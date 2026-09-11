@@ -34,6 +34,17 @@ namespace Povala.Api.Controllers
         }
 
 
+        [HttpGet]
+        [Authorize]
+        // Maybe change it to some boulderDTO later
+        // pagination maybe needed later if there is a lot of boulders
+        public async Task<ActionResult<List<Boulder>>> GetAllBoulders()
+        {
+            var result = await _context.Boulders.Where(b => b.IsActive == true).ToListAsync();
+
+            return Ok(result);
+        }
+
         [HttpPost]
         [Authorize(Roles = AppRoles.Admin)]
         // maybe change type of input parameter to CreateBoulderDTO later
