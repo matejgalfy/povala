@@ -55,4 +55,34 @@ public partial class MapViewModel : ObservableObject
             System.Diagnostics.Debug.WriteLine($"Error loading map data: {ex.Message}");
         }
     }
+
+    public async Task DeleteBoulderAsync(int boulderId)
+    {
+        var success = await _boulderApiService.DeleteAsync(boulderId);
+        if (success) await LoadDataAsync();
+    }
+
+    public async Task MarkAscentAsync(int boulderId)
+    {
+        var success = await _ascentsApiService.CreateAsync(new CreateAscentDto { BoulderId = boulderId });
+        if (success != null) await LoadDataAsync();
+    }
+
+    public async Task RemoveAscentAsync(int ascentId)
+    {
+        var success = await _ascentsApiService.DeleteAsync(ascentId);
+        if (success) await LoadDataAsync();
+    }
+
+    public async Task MarkProjectAsync(int boulderId)
+    {
+        var success = await _projectsApiService.CreateAsync(new CreateProjectDto { BoulderId = boulderId });
+        if (success != null) await LoadDataAsync();
+    }
+
+    public async Task RemoveProjectAsync(int projectId)
+    {
+        var success = await _projectsApiService.DeleteAsync(projectId);
+        if (success) await LoadDataAsync();
+    }
 }

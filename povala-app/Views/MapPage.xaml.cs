@@ -74,9 +74,46 @@ namespace povala_app.Views
 
         private async void OnBoulderTapped(object? sender, TappedEventArgs e)
         {
-            if (e.Parameter is BoulderDto boulder)
+            if (e.Parameter is not BoulderDto boulder) return;
+            if (BindingContext is not MapViewModel viewModel) return;
+
+            var role = await SecureStorage.GetAsync("user_role");
+
+            if (role == "Admin")
             {
-                await Application.Current!.MainPage!.DisplayAlert("Boulder info", $"Klikol si na boulder ID: {boulder.Id}\nFarba: {boulder.Color}\nObtiažnosť: {boulder.Difficulty}", "OK");
+                var action = await Application.Current!.Windows[0].Page!.DisplayActionSheetAsync(
+                    $"Manage boulder {boulder.Id} ({boulder.Color}, {boulder.Difficulty})", 
+                    "Cancel", 
+                    "Delete boulder");
+
+                if (action == "Delete boulder")
+                {
+                    await viewModel.DeleteBoulderAsync(boulder.Id);
+                }
+            }
+            else // Role: User
+            {
+                var existingAscent = viewModel.MyAscents.FirstOrDefault(a => a.BoulderId == boulder.Id);
+                var existingProject = viewModel.MyProjects.FirstOrDefault(p => p.BoulderId == boulder.Id);
+
+                string ascentOption = existingAscent != null ? "Remove ascent" : "Mark as ascended";
+                string projectOption = existingProject != null ? "Remove project" : "Mark as project";
+
+                var action = await Application.Current!.Windows[0].Page!.DisplayActionSheetAsync(
+                    $"Boulder {boulder.Id} ({boulder.Color}, {boulder.Difficulty})", 
+                    "Cancel", 
+                    null, 
+                    ascentOption, 
+                    projectOption);
+
+                if (action == "Mark as ascended")
+                    await viewModel.MarkAscentAsync(boulder.Id);
+                else if (action == "Remove ascent" && existingAscent != null)
+                    await viewModel.RemoveAscentAsync(existingAscent.Id);
+                else if (action == "Mark as project")
+                    await viewModel.MarkProjectAsync(boulder.Id);
+                else if (action == "Remove project" && existingProject != null)
+                    await viewModel.RemoveProjectAsync(existingProject.Id);
             }
         }
     }
