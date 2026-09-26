@@ -62,14 +62,20 @@ public class AuthApiService
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadFromJsonAsync<JsonElement>();
-                var token = json.GetProperty("token").GetString();
+                string? token = null;
+                if (json.TryGetProperty("token", out var tokenProp)) token = tokenProp.GetString();
+                else if (json.TryGetProperty("Token", out var tokenProp2)) token = tokenProp2.GetString();
+
+                if (string.IsNullOrEmpty(token))
+                    return ("Login failed. Token not received.", null);
 
                 var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
                 var jwt = handler.ReadJwtToken(token);
-                var role = jwt.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+                
+                var role = jwt.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role || c.Type == "role")?.Value ?? "User";
 
-                await SecureStorage.SetAsync("auth_token", token!);
-                await SecureStorage.SetAsync("user_role", role!);
+                await SecureStorage.SetAsync("auth_token", token);
+                await SecureStorage.SetAsync("user_role", role);
 
                 return (null, role);
             }
