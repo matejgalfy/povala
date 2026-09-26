@@ -1,4 +1,7 @@
-﻿namespace povala_app.Views
+using povala_app.ViewModels;
+using Povala.Shared.DTOs.Boulder;
+
+namespace povala_app.Views
 {
     public partial class MapPage : ContentPage
     {
@@ -7,12 +10,22 @@
         private double _xOffset = 0;
         private double _yOffset = 0;
 
-        public MapPage()
+        public MapPage(MapViewModel viewModel)
         {
             InitializeComponent();
+            BindingContext = viewModel;
         }
 
-        private void OnPinchUpdated(object sender, PinchGestureUpdatedEventArgs e)
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+            if (BindingContext is MapViewModel viewModel)
+            {
+                await viewModel.LoadDataAsync();
+            }
+        }
+
+        private void OnPinchUpdated(object? sender, PinchGestureUpdatedEventArgs e)
         {
             if (e.Status == GestureStatus.Started)
             {
@@ -40,7 +53,7 @@
             }
         }
 
-        private void OnPanUpdated(object sender, PanUpdatedEventArgs e)
+        private void OnPanUpdated(object? sender, PanUpdatedEventArgs e)
         {
             if (ZoomContainer.Scale > 1)
             {
@@ -59,9 +72,12 @@
             }
         }
 
-        private async void OnBoulderTapped(object sender, TappedEventArgs e)
+        private async void OnBoulderTapped(object? sender, TappedEventArgs e)
         {
-            await DisplayAlertAsync("Prelez", "Klikol si na boulder na interaktívnej mape!", "OK");
+            if (e.Parameter is BoulderDto boulder)
+            {
+                await Application.Current!.MainPage!.DisplayAlert("Boulder info", $"Klikol si na boulder ID: {boulder.Id}\nFarba: {boulder.Color}\nObtiažnosť: {boulder.Difficulty}", "OK");
+            }
         }
     }
 }
