@@ -56,16 +56,32 @@ namespace Povala.Api.Controllers
 
         [HttpPost]
         [Authorize(Roles = AppRoles.Admin)]
-        // maybe change type of input parameter to CreateBoulderDTO later
-        public async Task<ActionResult<Boulder>> CreateBoulder(Boulder boulder) 
+        public async Task<ActionResult<BoulderDto>> CreateBoulder(CreateBoulderDto dto) 
         {
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userIdStr == null)
                 return Unauthorized();
 
+            var boulder = new Boulder
+            {
+                Difficulty = dto.Difficulty,
+                Color = dto.Color,
+                CoordX = dto.CoordX,
+                CoordY = dto.CoordY,
+                IsActive = true
+            };
+
             _context.Boulders.Add(boulder);
             await _context.SaveChangesAsync();
-            return Ok(boulder); 
+
+            return Ok(new BoulderDto
+            {
+                Id = boulder.Id,
+                Difficulty = boulder.Difficulty,
+                Color = boulder.Color,
+                CoordX = boulder.CoordX,
+                CoordY = boulder.CoordY
+            });
         }
 
 
