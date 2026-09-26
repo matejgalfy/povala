@@ -87,7 +87,7 @@
 	  <Compile Update="Views\UserShell.xaml.cs">
 	    <DependentUpon>UserShell.xaml</DependentUpon>
 	  </Compile>
-	  <Compile Update="Views\User\MapPage.xaml.cs">
+	  <Compile Update="Views\MapPage.xaml.cs">
 	    <DependentUpon>MapPage.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>

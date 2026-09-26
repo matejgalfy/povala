@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="povala_app.Views.MapPage"
+             Title="">
+
+    <ContentView IsClippedToBounds="True" BackgroundColor="Black">
+        <AbsoluteLayout x:Name="ZoomContainer">
+
+            <AbsoluteLayout.GestureRecognizers>
+                <PinchGestureRecognizer PinchUpdated="OnPinchUpdated" />
+                <PanGestureRecognizer PanUpdated="OnPanUpdated" />
+            </AbsoluteLayout.GestureRecognizers>
+
+            <Image Source="map_icon.png"
+                   AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
+                   AbsoluteLayout.LayoutFlags="All"
+                   Aspect="AspectFill" />
+
+            <BoxView Color="Red"
+                     WidthRequest="20"
+                     HeightRequest="20"
+                     CornerRadius="10"
+                     AbsoluteLayout.LayoutBounds="0.5, 0.5, Auto, Auto"
+                     AbsoluteLayout.LayoutFlags="PositionProportional">
+                <BoxView.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnBoulderTapped" />
+                </BoxView.GestureRecognizers>
+            </BoxView>
+
+        </AbsoluteLayout>
+    </ContentView>
+
+</ContentPage>
