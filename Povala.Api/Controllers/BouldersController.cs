@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +6,7 @@ using Povala.Api.Data;
 using Povala.Api.Models;
 using System.Security.Claims;
 using Povala.Shared.Constants;
+using Povala.Shared.DTOs.Boulder;
 
 namespace Povala.Api.Controllers
 {
@@ -36,11 +37,19 @@ namespace Povala.Api.Controllers
 
         [HttpGet]
         [Authorize]
-        // Maybe change it to some boulderDTO later
-        // pagination maybe needed later if there is a lot of boulders
-        public async Task<ActionResult<List<Boulder>>> GetAllBoulders()
+        public async Task<ActionResult<List<BoulderDto>>> GetAllBoulders()
         {
-            var result = await _context.Boulders.Where(b => b.IsActive == true).ToListAsync();
+            var result = await _context.Boulders
+                .Where(b => b.IsActive)
+                .Select(b => new BoulderDto
+                {
+                    Id = b.Id,
+                    Difficulty = b.Difficulty,
+                    Color = b.Color,
+                    CoordX = b.CoordX,
+                    CoordY = b.CoordY
+                })
+                .ToListAsync();
 
             return Ok(result);
         }
