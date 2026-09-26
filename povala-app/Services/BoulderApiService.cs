@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Text.Json;
 using Povala.Shared.DTOs.Boulder;
 
@@ -15,6 +15,10 @@ public class BoulderApiService
 
     public async Task<List<BoulderDto>> GetAllBouldersAsync()
     {
+        var token = await SecureStorage.GetAsync("auth_token");
+        if (!string.IsNullOrEmpty(token))
+            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
         var boulders = await _httpClient.GetAsync("/api/boulders");
 
         boulders.EnsureSuccessStatusCode();
@@ -27,6 +31,11 @@ public class BoulderApiService
     {
         var json = JsonSerializer.Serialize(newBoulder);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var token = await SecureStorage.GetAsync("auth_token");
+        if (!string.IsNullOrEmpty(token))
+            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
         var response = await _httpClient.PostAsync("/api/boulders", content);
         if (!response.IsSuccessStatusCode)
             return null;
@@ -34,7 +43,14 @@ public class BoulderApiService
         return JsonSerializer.Deserialize<BoulderDto>(responseJson);
     }
 
+    public async Task<bool> DeleteAsync(int id)
+    {
+        var token = await SecureStorage.GetAsync("auth_token");
+        if (!string.IsNullOrEmpty(token))
+            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-
+        var response = await _httpClient.DeleteAsync($"/api/boulders/{id}");
+        return response.IsSuccessStatusCode;
+    }
 }
 
