@@ -12,7 +12,7 @@
                 <PanGestureRecognizer PanUpdated="OnPanUpdated" />
             </AbsoluteLayout.GestureRecognizers>
 
-            <Image Source="map_icon.png"
+            <Image Source="dummy-gym.jpg"
                    AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
                    AbsoluteLayout.LayoutFlags="All"
                    Aspect="AspectFill" />
