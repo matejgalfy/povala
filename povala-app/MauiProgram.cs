@@ -2,7 +2,6 @@ using Microsoft.Extensions.Logging;
 using povala_app.Services;
 using povala_app.ViewModels;
 using povala_app.Views;
-using povala_app.Views.Admin;
 using LoginViewModel = povala_app.ViewModels.Auth.LoginViewModel;
 using RegisterViewModel = povala_app.ViewModels.Auth.RegisterViewModel;
 
@@ -23,7 +22,11 @@ namespace povala_app
                 })
                 .Services.AddHttpClient("PovalaApi", client =>
                 {
-                    client.BaseAddress = new Uri("http://10.0.2.2:5058");
+                    string apiIp = DeviceInfo.Platform == DevicePlatform.Android 
+                        ? (DeviceInfo.DeviceType == DeviceType.Physical ? "192.168.0.102" : "10.0.2.2") 
+                        : "localhost";
+
+                    client.BaseAddress = new Uri($"http://{apiIp}:5058");
                 });
 
             builder.Services.AddSingleton<AuthApiService>();
@@ -40,7 +43,6 @@ namespace povala_app
             builder.Services.AddTransient<MapViewModel>();
             builder.Services.AddTransient<MapPage>();
             builder.Services.AddTransient<ProfilePage>();
-            builder.Services.AddTransient<AdminPage>();
 
 
 
