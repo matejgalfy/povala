@@ -1,5 +1,7 @@
+using Microsoft.Maui.Controls.Shapes;
 using povala_app.ViewModels;
 using Povala.Shared.DTOs.Boulder;
+using Povala.Shared.Enums;
 
 namespace povala_app.Views
 {
@@ -22,7 +24,59 @@ namespace povala_app.Views
             if (BindingContext is MapViewModel viewModel)
             {
                 await viewModel.LoadDataAsync();
+                RenderBoulders();
             }
+        }
+
+        private void RenderBoulders()
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                if (BindingContext is not MapViewModel viewModel) return;
+
+            // Remove old boulder dots (keep the Image which is the first child)
+            while (ZoomContainer.Children.Count > 1)
+            {
+                ZoomContainer.Children.RemoveAt(ZoomContainer.Children.Count - 1);
+            }
+
+            foreach (var boulder in viewModel.AvailableBoulders)
+            {
+                var dot = new Ellipse
+                {
+                    WidthRequest = 20,
+                    HeightRequest = 20,
+                    Fill = GetBrushForColor(boulder.Color),
+                    Stroke = new SolidColorBrush(Colors.White),
+                    StrokeThickness = 1
+                };
+
+                var tapGesture = new TapGestureRecognizer();
+                tapGesture.Tapped += OnBoulderTapped;
+                tapGesture.CommandParameter = boulder;
+                dot.GestureRecognizers.Add(tapGesture);
+
+                AbsoluteLayout.SetLayoutBounds(dot, new Rect(boulder.CoordX - 10, boulder.CoordY - 10, 20, 20));
+                AbsoluteLayout.SetLayoutFlags(dot, Microsoft.Maui.Layouts.AbsoluteLayoutFlags.None);
+
+                ZoomContainer.Children.Add(dot);
+            }
+            });
+        }
+
+        private static SolidColorBrush GetBrushForColor(BoulderColor color)
+        {
+            return color switch
+            {
+                BoulderColor.White => new SolidColorBrush(Colors.White),
+                BoulderColor.Yellow => new SolidColorBrush(Colors.Yellow),
+                BoulderColor.Green => new SolidColorBrush(Colors.LimeGreen),
+                BoulderColor.Blue => new SolidColorBrush(Colors.DodgerBlue),
+                BoulderColor.Red => new SolidColorBrush(Colors.Red),
+                BoulderColor.Black => new SolidColorBrush(Colors.Black),
+                BoulderColor.Purple => new SolidColorBrush(Colors.Purple),
+                _ => new SolidColorBrush(Colors.Gray)
+            };
         }
 
         private void OnPinchUpdated(object? sender, PinchGestureUpdatedEventArgs e)
@@ -35,6 +89,7 @@ namespace povala_app.Views
             }
             else if (e.Status == GestureStatus.Running)
             {
+                // Fix for buggy zoom-out
                 _currentScale += (e.Scale - 1) * _startScale;
                 _currentScale = Math.Max(1, _currentScale);
                 _currentScale = Math.Min(_currentScale, 5);
@@ -43,12 +98,19 @@ namespace povala_app.Views
             }
             else if (e.Status == GestureStatus.Completed)
             {
+                _xOffset = ZoomContainer.TranslationX;
+                _yOffset = ZoomContainer.TranslationY;
+                
                 if (_currentScale == 1)
                 {
                     ZoomContainer.TranslationX = 0;
                     ZoomContainer.TranslationY = 0;
                     _xOffset = 0;
                     _yOffset = 0;
+                }
+                else 
+                {
+                    ClampTranslation();
                 }
             }
         }
@@ -62,6 +124,7 @@ namespace povala_app.Views
                     case GestureStatus.Running:
                         ZoomContainer.TranslationX = _xOffset + e.TotalX;
                         ZoomContainer.TranslationY = _yOffset + e.TotalY;
+                        ClampTranslation();
                         break;
 
                     case GestureStatus.Completed:
@@ -70,6 +133,16 @@ namespace povala_app.Views
                         break;
                 }
             }
+        }
+
+        private void ClampTranslation()
+        {
+            // Calculate the maximum allowed translation based on the current scale
+            double maxTranslationX = ZoomContainer.Width * (ZoomContainer.Scale - 1) / 2;
+            double maxTranslationY = ZoomContainer.Height * (ZoomContainer.Scale - 1) / 2;
+
+            ZoomContainer.TranslationX = Math.Clamp(ZoomContainer.TranslationX, -maxTranslationX, maxTranslationX);
+            ZoomContainer.TranslationY = Math.Clamp(ZoomContainer.TranslationY, -maxTranslationY, maxTranslationY);
         }
 
         private async void OnBoulderTapped(object? sender, TappedEventArgs e)
@@ -81,7 +154,7 @@ namespace povala_app.Views
 
             if (role == "Admin")
             {
-                var action = await Application.Current!.Windows[0].Page!.DisplayActionSheetAsync(
+                var action = await this.DisplayActionSheetAsync(
                     $"Manage boulder {boulder.Id} ({boulder.Color}, {boulder.Difficulty})", 
                     "Cancel", 
                     "Delete boulder");
@@ -89,9 +162,10 @@ namespace povala_app.Views
                 if (action == "Delete boulder")
                 {
                     await viewModel.DeleteBoulderAsync(boulder.Id);
+                    RenderBoulders();
                 }
             }
-            else // Role: User
+            else
             {
                 var existingAscent = viewModel.MyAscents.FirstOrDefault(a => a.BoulderId == boulder.Id);
                 var existingProject = viewModel.MyProjects.FirstOrDefault(p => p.BoulderId == boulder.Id);
@@ -99,7 +173,7 @@ namespace povala_app.Views
                 string ascentOption = existingAscent != null ? "Remove ascent" : "Mark as ascended";
                 string projectOption = existingProject != null ? "Remove project" : "Mark as project";
 
-                var action = await Application.Current!.Windows[0].Page!.DisplayActionSheetAsync(
+                var action = await this.DisplayActionSheetAsync(
                     $"Boulder {boulder.Id} ({boulder.Color}, {boulder.Difficulty})", 
                     "Cancel", 
                     null, 
@@ -115,6 +189,58 @@ namespace povala_app.Views
                 else if (action == "Remove project" && existingProject != null)
                     await viewModel.RemoveProjectAsync(existingProject.Id);
             }
+        }
+
+        private async void OnMapTapped(object? sender, TappedEventArgs e)
+        {
+            var role = await SecureStorage.GetAsync("user_role");
+            if (role != "Admin") return;
+
+            if (BindingContext is not MapViewModel viewModel) return;
+
+            var position = e.GetPosition(ZoomContainer);
+            if (position == null) return;
+
+            double x = position.Value.X;
+            double y = position.Value.Y;
+
+            var colorNames = Enum.GetNames<BoulderColor>();
+            var selectedColor = await this.DisplayActionSheetAsync(
+                $"Add boulder at ({x:F0}, {y:F0}) — Select color:", 
+                "Cancel", 
+                null, 
+                colorNames);
+
+            if (string.IsNullOrEmpty(selectedColor) || selectedColor == "Cancel") return;
+
+            var difficultyNames = Enum.GetNames<BoulderDifficulty>();
+            var selectedDifficulty = await this.DisplayActionSheetAsync(
+                "Select difficulty:", 
+                "Cancel", 
+                null, 
+                difficultyNames);
+
+            if (string.IsNullOrEmpty(selectedDifficulty) || selectedDifficulty == "Cancel") return;
+
+            var newBoulder = new CreateBoulderDto
+            {
+                CoordX = x,
+                CoordY = y,
+                Color = Enum.Parse<BoulderColor>(selectedColor),
+                Difficulty = Enum.Parse<BoulderDifficulty>(selectedDifficulty)
+            };
+
+            await viewModel.CreateBoulderAsync(newBoulder);
+            RenderBoulders();
+        }
+
+        private async void OnLogoutClicked(object? sender, EventArgs e)
+        {
+            SecureStorage.Remove("auth_token");
+            SecureStorage.Remove("user_role");
+
+            var loginPage = Handler!.MauiContext!.Services.GetRequiredService<LoginPage>();
+            Application.Current!.Windows[0].Page = new NavigationPage(loginPage);
         }
     }
 }

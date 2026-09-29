@@ -1,45 +1,28 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:converters="clr-namespace:povala_app.Converters"
-             xmlns:shapes="clr-namespace:Microsoft.Maui.Controls.Shapes;assembly=Microsoft.Maui.Controls"
              x:Class="povala_app.Views.MapPage"
-             Title="">
+             Title="Map">
 
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <converters:BoulderToRectConverter x:Key="BoulderToRectConverter" />
-            <converters:BoulderColorConverter x:Key="BoulderColorConverter" />
-        </ResourceDictionary>
-    </ContentPage.Resources>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Logout" Clicked="OnLogoutClicked" />
+    </ContentPage.ToolbarItems>
 
     <ContentView IsClippedToBounds="True" BackgroundColor="Black">
-        <AbsoluteLayout x:Name="ZoomContainer"
-                        BindableLayout.ItemsSource="{Binding AvailableBoulders}">
+        <AbsoluteLayout x:Name="ZoomContainer">
 
-            <AbsoluteLayout.GestureRecognizers>
-                <PinchGestureRecognizer PinchUpdated="OnPinchUpdated" />
-                <PanGestureRecognizer PanUpdated="OnPanUpdated" />
-            </AbsoluteLayout.GestureRecognizers>
-
-            <Image Source="dummy_gym.jpg"
+            <Image x:Name="MapImage"
+                   Source="dummy_gym.jpg"
                    AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
                    AbsoluteLayout.LayoutFlags="All"
-                   Aspect="AspectFill" />
+                   Aspect="AspectFill">
+                <Image.GestureRecognizers>
+                    <PinchGestureRecognizer PinchUpdated="OnPinchUpdated" />
+                    <PanGestureRecognizer PanUpdated="OnPanUpdated" />
+                    <TapGestureRecognizer Tapped="OnMapTapped" />
+                </Image.GestureRecognizers>
+            </Image>
 
-            <BindableLayout.ItemTemplate>
-                <DataTemplate>
-                    <shapes:Ellipse Fill="{Binding Color, Converter={StaticResource BoulderColorConverter}}"
-                                    Stroke="White"
-                                    StrokeThickness="1"
-                                    AbsoluteLayout.LayoutBounds="{Binding ., Converter={StaticResource BoulderToRectConverter}}"
-                                    AbsoluteLayout.LayoutFlags="None">
-                        <shapes:Ellipse.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="OnBoulderTapped" CommandParameter="{Binding .}" />
-                        </shapes:Ellipse.GestureRecognizers>
-                    </shapes:Ellipse>
-                </DataTemplate>
-            </BindableLayout.ItemTemplate>
 
         </AbsoluteLayout>
     </ContentView>
