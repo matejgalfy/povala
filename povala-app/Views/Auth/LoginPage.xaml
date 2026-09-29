@@ -2,10 +2,10 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="povala_app.Views.LoginPage"
-             Title="LoginPage">
+             Title="">
     <VerticalStackLayout Spacing="15" Padding="30" VerticalOptions="Center">
 
-        <Label Text="Login into an account" 
+        <Label Text="Login into your Povala account" 
                FontSize="24" 
                FontAttributes="Bold" 
                HorizontalOptions="Center" 

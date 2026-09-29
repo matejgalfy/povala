@@ -44,6 +44,7 @@ namespace povala_app
             builder.Services.AddTransient<MapViewModel>();
             builder.Services.AddTransient<MapPage>();
             builder.Services.AddTransient<ProfilePage>();
+            builder.Services.AddTransient<AdminProfilePage>();
 
 
 

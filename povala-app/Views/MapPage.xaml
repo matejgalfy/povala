@@ -4,10 +4,6 @@
              x:Class="povala_app.Views.MapPage"
              Title="Map">
 
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Logout" Clicked="OnLogoutClicked" />
-    </ContentPage.ToolbarItems>
-
     <ContentView IsClippedToBounds="True" BackgroundColor="Black">
         <AbsoluteLayout x:Name="ZoomContainer">
 

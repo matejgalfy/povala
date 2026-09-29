@@ -213,7 +213,7 @@ namespace povala_app.Views
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error in OnBoulderTapped: {ex.Message}");
-                await DisplayAlert("Error", "Action failed. Check connection.", "OK");
+                await DisplayAlertAsync("Error", "Action failed. Check connection.", "OK");
             }
         }
 
@@ -264,17 +264,8 @@ namespace povala_app.Views
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error in OnMapTapped: {ex.Message}");
-                await DisplayAlert("Error", "Could not add boulder. Check connection.", "OK");
+                await DisplayAlertAsync("Error", "Could not add boulder. Check connection.", "OK");
             }
-        }
-
-        private async void OnLogoutClicked(object? sender, EventArgs e)
-        {
-            SecureStorage.Remove("auth_token");
-            SecureStorage.Remove("user_role");
-
-            var loginPage = Handler!.MauiContext!.Services.GetRequiredService<LoginPage>();
-            Application.Current!.Windows[0].Page = new NavigationPage(loginPage);
         }
     }
 }

@@ -12,6 +12,11 @@
             Icon="map_icon.png"
             ContentTemplate="{DataTemplate views:MapPage}"
             Route="MapPage" />
+        <ShellContent
+            Title="Profile"
+            Icon="profile_icon.png"
+            ContentTemplate="{DataTemplate views:AdminProfilePage}"
+            Route="AdminProfilePage" />
     </TabBar>
 
 </Shell>
