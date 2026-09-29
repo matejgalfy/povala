@@ -2,8 +2,8 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="povala_app.Views.ProfilePage"
-             Title="ProfilePage">
-    <VerticalStackLayout Padding="20" Spacing="20" VerticalOptions="Center">
+             Title="">
+    <VerticalStackLayout Padding="20" Spacing="20" VerticalOptions="Start">
         <Label 
             Text="User Profile"
             FontSize="24"
