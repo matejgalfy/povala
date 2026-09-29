@@ -110,4 +110,21 @@
 	  </MauiXaml>
 	</ItemGroup>
 
+	<Target Name="InjectDevPcIp" BeforeTargets="BeforeCompile">
+		<!-- Get the IPv4 address from ipconfig using PowerShell and a simple regex pattern -->
+		<Exec Command="powershell -Command &quot;(ipconfig | Select-String 'IPv4' | Select-Object -First 1).ToString().Split(':')[1].Trim()&quot;" ConsoleToMSBuild="true">
+			<Output TaskParameter="ConsoleOutput" PropertyName="DevPcIpAddress" />
+		</Exec>
+
+		<!-- Write the IP to a C# configuration class in the obj/ directory so it's auto-compiled -->
+		<WriteLinesToFile 
+			File="$(IntermediateOutputPath)DevConfig.g.cs" 
+			Lines="namespace povala_app%3B public static class DevConfig { public const string PcIpAddress = &quot;$(DevPcIpAddress)&quot;%3B }" 
+			Overwrite="true" />
+
+		<!-- Make sure the generated file is compiled -->
+		<ItemGroup>
+			<Compile Include="$(IntermediateOutputPath)DevConfig.g.cs" />
+		</ItemGroup>
+	</Target>
 </Project>
