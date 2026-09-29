@@ -62,6 +62,12 @@ public partial class MapViewModel : ObservableObject
         if (success) await LoadDataAsync();
     }
 
+    public async Task CreateBoulderAsync(CreateBoulderDto newBoulder)
+    {
+        var result = await _boulderApiService.CreateAsync(newBoulder);
+        if (result != null) await LoadDataAsync();
+    }
+
     public async Task MarkAscentAsync(int boulderId)
     {
         var success = await _ascentsApiService.CreateAsync(new CreateAscentDto { BoulderId = boulderId });
