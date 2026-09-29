@@ -1,6 +1,6 @@
 # Povala - Bouldering App
 
-Povala is a simplified application designed for managing and navigating a single specific bouldering gym. It consists of a backend (ASP.NET Core API) and a client application (.NET MAUI).
+Povala is a simplified application designed for managing and navigating a single specific bouldering gym (similar to TopLogger). It consists of a backend (ASP.NET Core API) and a client application (.NET MAUI).
 
 ## Architecture and Features
 
@@ -11,7 +11,7 @@ The application uses a simplified system of two roles:
 1. **Owner:** 
    - Has access to the map management interface.
    - Can add a new boulder by tapping on the map, specifying its color and difficulty (coordinates are saved automatically).
-   - Can delete or deactivate (archive) existing boulders by tapping on them.
+   - Can soft delete existing boulders by tapping on them.
 2. **User (Climber):**
    - Has access to the standard user view (`UserShell`).
    - Can see the visual map of the gym with all current boulders.
@@ -35,5 +35,4 @@ The application uses a simplified system of two roles:
 3. Compile and run the application on your desired emulator (Android, iOS) or as a local Windows application (Windows Machine).
 
 ## Future Development
-- Finalizing the interactive map to render dots (boulders) over the gym floor plan using `AbsoluteLayout`.
-- Visualizing the climber's profile with a success rate chart and completed projects.
+- Climber's profile with statistics about projecting boulders at different grades.

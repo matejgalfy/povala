@@ -7,8 +7,8 @@ namespace povala_app.Views
 {
     public partial class MapPage : ContentPage
     {
-        private double _currentScale = 1;
-        private double _startScale = 1;
+        private double _currentScale = 1.001;
+        private double _startScale = 1.001;
         private double _xOffset = 0;
         private double _yOffset = 0;
 
@@ -21,6 +21,7 @@ namespace povala_app.Views
         protected override async void OnAppearing()
         {
             base.OnAppearing();
+            ZoomContainer.Scale = _currentScale;
             if (BindingContext is MapViewModel viewModel)
             {
                 await viewModel.LoadDataAsync();
@@ -84,14 +85,28 @@ namespace povala_app.Views
             if (e.Status == GestureStatus.Started)
             {
                 _startScale = ZoomContainer.Scale;
-                ZoomContainer.AnchorX = e.ScaleOrigin.X;
-                ZoomContainer.AnchorY = e.ScaleOrigin.Y;
+                
+                // Compensate translation to avoid visual jump when changing anchor on scaled image
+                var newAnchorX = e.ScaleOrigin.X;
+                var newAnchorY = e.ScaleOrigin.Y;
+                
+                var shiftX = (newAnchorX - ZoomContainer.AnchorX) * ZoomContainer.Width * (_startScale - 1);
+                var shiftY = (newAnchorY - ZoomContainer.AnchorY) * ZoomContainer.Height * (_startScale - 1);
+
+                ZoomContainer.TranslationX += shiftX;
+                ZoomContainer.TranslationY += shiftY;
+
+                ZoomContainer.AnchorX = newAnchorX;
+                ZoomContainer.AnchorY = newAnchorY;
+
+                _xOffset = ZoomContainer.TranslationX;
+                _yOffset = ZoomContainer.TranslationY;
             }
             else if (e.Status == GestureStatus.Running)
             {
                 // Fix for buggy zoom-out
                 _currentScale += (e.Scale - 1) * _startScale;
-                _currentScale = Math.Max(1, _currentScale);
+                _currentScale = Math.Max(1.001, _currentScale);
                 _currentScale = Math.Min(_currentScale, 5);
 
                 ZoomContainer.Scale = _currentScale;
@@ -101,7 +116,7 @@ namespace povala_app.Views
                 _xOffset = ZoomContainer.TranslationX;
                 _yOffset = ZoomContainer.TranslationY;
                 
-                if (_currentScale == 1)
+                if (_currentScale <= 1.001)
                 {
                     ZoomContainer.TranslationX = 0;
                     ZoomContainer.TranslationY = 0;
@@ -117,7 +132,7 @@ namespace povala_app.Views
 
         private void OnPanUpdated(object? sender, PanUpdatedEventArgs e)
         {
-            if (ZoomContainer.Scale > 1)
+            if (ZoomContainer.Scale > 1.001)
             {
                 switch (e.StatusType)
                 {
@@ -137,101 +152,120 @@ namespace povala_app.Views
 
         private void ClampTranslation()
         {
-            // Calculate the maximum allowed translation based on the current scale
-            double maxTranslationX = ZoomContainer.Width * (ZoomContainer.Scale - 1) / 2;
-            double maxTranslationY = ZoomContainer.Height * (ZoomContainer.Scale - 1) / 2;
+            // Calculate the max/min allowed translation based on the current scale and anchor
+            double minTranslationX = -ZoomContainer.Width * (ZoomContainer.Scale - 1) * (1 - ZoomContainer.AnchorX);
+            double maxTranslationX = ZoomContainer.Width * (ZoomContainer.Scale - 1) * ZoomContainer.AnchorX;
 
-            ZoomContainer.TranslationX = Math.Clamp(ZoomContainer.TranslationX, -maxTranslationX, maxTranslationX);
-            ZoomContainer.TranslationY = Math.Clamp(ZoomContainer.TranslationY, -maxTranslationY, maxTranslationY);
+            double minTranslationY = -ZoomContainer.Height * (ZoomContainer.Scale - 1) * (1 - ZoomContainer.AnchorY);
+            double maxTranslationY = ZoomContainer.Height * (ZoomContainer.Scale - 1) * ZoomContainer.AnchorY;
+
+            ZoomContainer.TranslationX = Math.Clamp(ZoomContainer.TranslationX, minTranslationX, maxTranslationX);
+            ZoomContainer.TranslationY = Math.Clamp(ZoomContainer.TranslationY, minTranslationY, maxTranslationY);
         }
 
         private async void OnBoulderTapped(object? sender, TappedEventArgs e)
         {
-            if (e.Parameter is not BoulderDto boulder) return;
-            if (BindingContext is not MapViewModel viewModel) return;
-
-            var role = await SecureStorage.GetAsync("user_role");
-
-            if (role == "Admin")
+            try
             {
-                var action = await this.DisplayActionSheetAsync(
-                    $"Manage boulder {boulder.Id} ({boulder.Color}, {boulder.Difficulty})", 
-                    "Cancel", 
-                    "Delete boulder");
+                if (e.Parameter is not BoulderDto boulder) return;
+                if (BindingContext is not MapViewModel viewModel) return;
 
-                if (action == "Delete boulder")
+                var role = await SecureStorage.GetAsync("user_role");
+
+                if (role == "Admin")
                 {
-                    await viewModel.DeleteBoulderAsync(boulder.Id);
-                    RenderBoulders();
+                    var action = await this.DisplayActionSheetAsync(
+                        $"Manage boulder {boulder.Id} ({boulder.Color}, {boulder.Difficulty})", 
+                        "Cancel", 
+                        "Delete boulder");
+
+                    if (action == "Delete boulder")
+                    {
+                        await viewModel.DeleteBoulderAsync(boulder.Id);
+                        RenderBoulders();
+                    }
+                }
+                else
+                {
+                    var existingAscent = viewModel.MyAscents.FirstOrDefault(a => a.BoulderId == boulder.Id);
+                    var existingProject = viewModel.MyProjects.FirstOrDefault(p => p.BoulderId == boulder.Id);
+
+                    string ascentOption = existingAscent != null ? "Remove ascent" : "Mark as ascended";
+                    string projectOption = existingProject != null ? "Remove project" : "Mark as project";
+
+                    var action = await this.DisplayActionSheetAsync(
+                        $"Boulder {boulder.Id} ({boulder.Color}, {boulder.Difficulty})", 
+                        "Cancel", 
+                        null, 
+                        ascentOption, 
+                        projectOption);
+
+                    if (action == "Mark as ascended")
+                        await viewModel.MarkAscentAsync(boulder.Id);
+                    else if (action == "Remove ascent" && existingAscent != null)
+                        await viewModel.RemoveAscentAsync(existingAscent.Id);
+                    else if (action == "Mark as project")
+                        await viewModel.MarkProjectAsync(boulder.Id);
+                    else if (action == "Remove project" && existingProject != null)
+                        await viewModel.RemoveProjectAsync(existingProject.Id);
                 }
             }
-            else
+            catch (Exception ex)
             {
-                var existingAscent = viewModel.MyAscents.FirstOrDefault(a => a.BoulderId == boulder.Id);
-                var existingProject = viewModel.MyProjects.FirstOrDefault(p => p.BoulderId == boulder.Id);
-
-                string ascentOption = existingAscent != null ? "Remove ascent" : "Mark as ascended";
-                string projectOption = existingProject != null ? "Remove project" : "Mark as project";
-
-                var action = await this.DisplayActionSheetAsync(
-                    $"Boulder {boulder.Id} ({boulder.Color}, {boulder.Difficulty})", 
-                    "Cancel", 
-                    null, 
-                    ascentOption, 
-                    projectOption);
-
-                if (action == "Mark as ascended")
-                    await viewModel.MarkAscentAsync(boulder.Id);
-                else if (action == "Remove ascent" && existingAscent != null)
-                    await viewModel.RemoveAscentAsync(existingAscent.Id);
-                else if (action == "Mark as project")
-                    await viewModel.MarkProjectAsync(boulder.Id);
-                else if (action == "Remove project" && existingProject != null)
-                    await viewModel.RemoveProjectAsync(existingProject.Id);
+                System.Diagnostics.Debug.WriteLine($"Error in OnBoulderTapped: {ex.Message}");
+                await DisplayAlert("Error", "Action failed. Check connection.", "OK");
             }
         }
 
         private async void OnMapTapped(object? sender, TappedEventArgs e)
         {
-            var role = await SecureStorage.GetAsync("user_role");
-            if (role != "Admin") return;
-
-            if (BindingContext is not MapViewModel viewModel) return;
-
-            var position = e.GetPosition(ZoomContainer);
-            if (position == null) return;
-
-            double x = position.Value.X;
-            double y = position.Value.Y;
-
-            var colorNames = Enum.GetNames<BoulderColor>();
-            var selectedColor = await this.DisplayActionSheetAsync(
-                $"Add boulder at ({x:F0}, {y:F0}) — Select color:", 
-                "Cancel", 
-                null, 
-                colorNames);
-
-            if (string.IsNullOrEmpty(selectedColor) || selectedColor == "Cancel") return;
-
-            var difficultyNames = Enum.GetNames<BoulderDifficulty>();
-            var selectedDifficulty = await this.DisplayActionSheetAsync(
-                "Select difficulty:", 
-                "Cancel", 
-                null, 
-                difficultyNames);
-
-            if (string.IsNullOrEmpty(selectedDifficulty) || selectedDifficulty == "Cancel") return;
-
-            var newBoulder = new CreateBoulderDto
+            try
             {
-                CoordX = x,
-                CoordY = y,
-                Color = Enum.Parse<BoulderColor>(selectedColor),
-                Difficulty = Enum.Parse<BoulderDifficulty>(selectedDifficulty)
-            };
+                var role = await SecureStorage.GetAsync("user_role");
+                if (role != "Admin") return;
 
-            await viewModel.CreateBoulderAsync(newBoulder);
-            RenderBoulders();
+                if (BindingContext is not MapViewModel viewModel) return;
+
+                var position = e.GetPosition((View)sender);
+                if (position == null) return;
+
+                double x = position.Value.X;
+                double y = position.Value.Y;
+
+                var colorNames = Enum.GetNames<BoulderColor>();
+                var selectedColor = await this.DisplayActionSheetAsync(
+                    $"Add boulder at ({x:F0}, {y:F0}) — Select color:", 
+                    "Cancel", 
+                    null, 
+                    colorNames);
+
+                if (string.IsNullOrEmpty(selectedColor) || selectedColor == "Cancel") return;
+
+                var difficultyNames = Enum.GetNames<BoulderDifficulty>();
+                var selectedDifficulty = await this.DisplayActionSheetAsync(
+                    "Select difficulty:", 
+                    "Cancel", 
+                    null, 
+                    difficultyNames);
+
+                if (string.IsNullOrEmpty(selectedDifficulty) || selectedDifficulty == "Cancel") return;
+
+                var newBoulder = new CreateBoulderDto
+                {
+                    CoordX = x,
+                    CoordY = y,
+                    Color = Enum.Parse<BoulderColor>(selectedColor),
+                    Difficulty = Enum.Parse<BoulderDifficulty>(selectedDifficulty)
+                };
+
+                await viewModel.CreateBoulderAsync(newBoulder);
+                RenderBoulders();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error in OnMapTapped: {ex.Message}");
+                await DisplayAlert("Error", "Could not add boulder. Check connection.", "OK");
+            }
         }
 
         private async void OnLogoutClicked(object? sender, EventArgs e)
