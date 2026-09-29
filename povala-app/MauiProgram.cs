@@ -22,8 +22,9 @@ namespace povala_app
                 })
                 .Services.AddHttpClient("PovalaApi", client =>
                 {
+                    // Have to dynamically change the ip address from cmd -> ipconfig -> ipv4 (for physical device type)
                     string apiIp = DeviceInfo.Platform == DevicePlatform.Android 
-                        ? (DeviceInfo.DeviceType == DeviceType.Physical ? "192.168.0.102" : "10.0.2.2") 
+                        ? (DeviceInfo.DeviceType == DeviceType.Physical ? "192.168.0.100" : "10.0.2.2") 
                         : "localhost";
 
                     client.BaseAddress = new Uri($"http://{apiIp}:5058");
