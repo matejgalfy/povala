@@ -35,33 +35,69 @@ namespace povala_app.Views
             {
                 if (BindingContext is not MapViewModel viewModel) return;
 
-            // Remove old boulder dots (keep the Image which is the first child)
-            while (ZoomContainer.Children.Count > 1)
-            {
-                ZoomContainer.Children.RemoveAt(ZoomContainer.Children.Count - 1);
-            }
-
-            foreach (var boulder in viewModel.AvailableBoulders)
-            {
-                var dot = new Ellipse
+                // Remove old boulder dots (keep the Image which is the first child)
+                while (ZoomContainer.Children.Count > 1)
                 {
-                    WidthRequest = 20,
-                    HeightRequest = 20,
-                    Fill = GetBrushForColor(boulder.Color),
-                    Stroke = new SolidColorBrush(Colors.White),
-                    StrokeThickness = 1
-                };
+                    ZoomContainer.Children.RemoveAt(ZoomContainer.Children.Count - 1);
+                }
 
-                var tapGesture = new TapGestureRecognizer();
-                tapGesture.Tapped += OnBoulderTapped;
-                tapGesture.CommandParameter = boulder;
-                dot.GestureRecognizers.Add(tapGesture);
+                foreach (var boulder in viewModel.AvailableBoulders)
+                {
+                    var grid = new Grid
+                    {
+                        WidthRequest = 20,
+                        HeightRequest = 20
+                    };
 
-                AbsoluteLayout.SetLayoutBounds(dot, new Rect(boulder.CoordX - 10, boulder.CoordY - 10, 20, 20));
-                AbsoluteLayout.SetLayoutFlags(dot, Microsoft.Maui.Layouts.AbsoluteLayoutFlags.None);
+                    var dot = new Ellipse
+                    {
+                        Fill = GetBrushForColor(boulder.Color),
+                        Stroke = new SolidColorBrush(Colors.White),
+                        StrokeThickness = 1,
+                        InputTransparent = true
+                    };
+                    grid.Children.Add(dot);
 
-                ZoomContainer.Children.Add(dot);
-            }
+                    bool isAscended = viewModel.MyAscents != null && viewModel.MyAscents.Any(a => a.BoulderId == boulder.Id);
+                    bool isProject = viewModel.MyProjects != null && viewModel.MyProjects.Any(p => p.BoulderId == boulder.Id);
+
+                    if (isAscended)
+                    {
+                        var check = new Label
+                        {
+                            Text = "✔",
+                            TextColor = (boulder.Color == BoulderColor.White || boulder.Color == BoulderColor.Yellow) ? Colors.Black : Colors.White,
+                            FontSize = 12,
+                            HorizontalOptions = LayoutOptions.Center,
+                            VerticalOptions = LayoutOptions.Center,
+                            FontAttributes = FontAttributes.Bold,
+                            InputTransparent = true
+                        };
+                        grid.Children.Add(check);
+                    }
+                    else if (isProject)
+                    {
+                        var target = new Label
+                        {
+                            Text = "🎯",
+                            FontSize = 12,
+                            HorizontalOptions = LayoutOptions.Center,
+                            VerticalOptions = LayoutOptions.Center,
+                            InputTransparent = true
+                        };
+                        grid.Children.Add(target);
+                    }
+
+                    var tapGesture = new TapGestureRecognizer();
+                    tapGesture.Tapped += OnBoulderTapped;
+                    tapGesture.CommandParameter = boulder;
+                    grid.GestureRecognizers.Add(tapGesture);
+
+                    AbsoluteLayout.SetLayoutBounds(grid, new Rect(boulder.CoordX - 10, boulder.CoordY - 10, 20, 20));
+                    AbsoluteLayout.SetLayoutFlags(grid, Microsoft.Maui.Layouts.AbsoluteLayoutFlags.None);
+
+                    ZoomContainer.Children.Add(grid);
+                }
             });
         }
 
@@ -208,6 +244,8 @@ namespace povala_app.Views
                         await viewModel.MarkProjectAsync(boulder.Id);
                     else if (action == "Remove project" && existingProject != null)
                         await viewModel.RemoveProjectAsync(existingProject.Id);
+                        
+                    RenderBoulders();
                 }
             }
             catch (Exception ex)
