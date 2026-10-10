@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Povala.Api.Data;
+using Povala.Api.Services;
 using Povala.Shared.DTOs.User;
 using System.Security.Claims;
 
@@ -11,11 +10,11 @@ namespace Povala.Api.Controllers
     [Route("api/[controller]")]
     public class StatsController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IStatsService _statsService;
 
-        public StatsController(ApplicationDbContext context)
+        public StatsController(IStatsService statsService)
         {
-            _context = context;
+            _statsService = statsService;
         }
 
 
@@ -27,30 +26,7 @@ namespace Povala.Api.Controllers
             if (userIdStr == null)
                 return Unauthorized();
 
-            var userId = int.Parse(userIdStr);
-
-            // Ascents count even if the boulder was removed from the wall since
-            var ascendedBoulders = await _context.Ascents
-                .Where(a => a.UserId == userId)
-                .Join(_context.Boulders, a => a.BoulderId, b => b.Id, (a, b) => new { b.Id, b.Difficulty })
-                .Distinct()
-                .ToListAsync();
-
-            var ascendedIds = ascendedBoulders.Select(b => b.Id).ToHashSet();
-
-            // Only projects on boulders that are still on the wall and not yet sent
-            var projectBoulderIds = await _context.Projects
-                .Where(p => p.UserId == userId)
-                .Join(_context.Boulders.Where(b => b.IsActive), p => p.BoulderId, b => b.Id, (p, b) => b.Id)
-                .Distinct()
-                .ToListAsync();
-
-            return Ok(new UserStatsDto
-            {
-                TotalAscents = ascendedBoulders.Count,
-                ActiveProjects = projectBoulderIds.Count(id => !ascendedIds.Contains(id)),
-                HighestGrade = ascendedBoulders.Count > 0 ? ascendedBoulders.Max(b => b.Difficulty) : null
-            });
+            return Ok(await _statsService.GetUserStatsAsync(int.Parse(userIdStr)));
         }
     }
 }

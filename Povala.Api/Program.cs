@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
 using Povala.Api.Models;
 using Povala.Api.Data;
+using Povala.Api.Services;
 using System.Text.Json.Serialization;
 using Scalar.AspNetCore;
 
@@ -49,6 +50,8 @@ builder.Services.AddAuthentication(options =>
             ClockSkew = TimeSpan.Zero
         };
     });
+
+builder.Services.AddScoped<IStatsService, StatsService>();
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
