@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using povala_app.Services;
 using povala_app.ViewModels;
+using povala_app.ViewModels.User;
 using povala_app.Views;
 using LoginViewModel = povala_app.ViewModels.Auth.LoginViewModel;
 using RegisterViewModel = povala_app.ViewModels.Auth.RegisterViewModel;
@@ -34,6 +35,7 @@ namespace povala_app
             builder.Services.AddSingleton<BoulderApiService>();
             builder.Services.AddSingleton<AscentsApiService>();
             builder.Services.AddSingleton<ProjectsApiService>();
+            builder.Services.AddSingleton<StatsApiService>();
 
             builder.Services.AddTransient<RegisterViewModel>();
             builder.Services.AddTransient<RegisterPage>();
@@ -43,6 +45,7 @@ namespace povala_app
 
             builder.Services.AddTransient<MapViewModel>();
             builder.Services.AddTransient<MapPage>();
+            builder.Services.AddTransient<ProfileViewModel>();
             builder.Services.AddTransient<ProfilePage>();
             builder.Services.AddTransient<AdminProfilePage>();
 
