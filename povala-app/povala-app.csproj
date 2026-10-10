@@ -40,6 +40,11 @@
 		<!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
 		<WindowsPackageType>None</WindowsPackageType>
 
+		<!-- How a physical Android device reaches the API:
+		     true  = over USB via `adb reverse tcp:5058 tcp:5058` (works on any network, e.g. school wifi with client isolation)
+		     false = over wifi via the PC's IP address (phone and PC must be on the same network) -->
+		<UseAdbReverse>true</UseAdbReverse>
+
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">15.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
@@ -119,12 +124,18 @@
 		<!-- Write the IP to a C# configuration class in the obj/ directory so it's auto-compiled -->
 		<WriteLinesToFile 
 			File="$(IntermediateOutputPath)DevConfig.g.cs" 
-			Lines="namespace povala_app%3B public static class DevConfig { public const string PcIpAddress = &quot;$(DevPcIpAddress)&quot;%3B }" 
+			Lines="namespace povala_app%3B public static class DevConfig { public const string PcIpAddress = &quot;$(DevPcIpAddress)&quot;%3B public const bool UseAdbReverse = $(UseAdbReverse.ToLowerInvariant())%3B }"
 			Overwrite="true" />
 
 		<!-- Make sure the generated file is compiled -->
 		<ItemGroup>
 			<Compile Include="$(IntermediateOutputPath)DevConfig.g.cs" />
 		</ItemGroup>
+	</Target>
+
+	<!-- Forward the phone's localhost:5058 to the PC's port 5058 over USB (-d = USB device only, ignores emulators).
+	     Only warns if no phone is connected. Must be re-run after reconnecting the phone (rebuild, or run the command manually). -->
+	<Target Name="AdbReverseApiPort" AfterTargets="_ResolveSdks" Condition="'$(UseAdbReverse)' == 'true' And $([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+		<Exec Command="&quot;$(AndroidSdkDirectory)\platform-tools\adb.exe&quot; -d reverse tcp:5058 tcp:5058" ContinueOnError="WarnAndContinue" />
 	</Target>
 </Project>

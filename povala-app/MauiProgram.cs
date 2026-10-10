@@ -23,9 +23,11 @@ namespace povala_app
                 })
                 .Services.AddHttpClient("PovalaApi", client =>
                 {
-                    // Uses the dynamically generated IP address from the .csproj PreBuild task (which gets it from your PC's ipconfig)
-                    string apiIp = DeviceInfo.Platform == DevicePlatform.Android 
-                        ? (DeviceInfo.DeviceType == DeviceType.Physical ? DevConfig.PcIpAddress : "10.0.2.2") 
+                    // Uses the dynamically generated IP address from the .csproj PreBuild task (which gets it from the PC's ipconfig)
+                    // or, with UseAdbReverse, the phone's own localhost which adb forwards to the PC over USB
+                    string physicalDeviceIp = DevConfig.UseAdbReverse ? "127.0.0.1" : DevConfig.PcIpAddress;
+                    string apiIp = DeviceInfo.Platform == DevicePlatform.Android
+                        ? (DeviceInfo.DeviceType == DeviceType.Physical ? physicalDeviceIp : "10.0.2.2")
                         : "localhost";
 
                     client.BaseAddress = new Uri($"http://{apiIp}:5058");
