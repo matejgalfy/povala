@@ -1,9 +1,11 @@
 <Solution>
   <Folder Name="/Solution Items/">
+    <File Path="AGENTS.md" />
     <File Path="README.md" />
-    <File Path="GEMINI.md" />
   </Folder>
-  <Project Path="povala-app/povala-app.csproj" />
+  <Project Path="povala-app/povala-app.csproj">
+    <Deploy Solution="Debug|*" />
+  </Project>
   <Project Path="Povala.Api/Povala.Api.csproj" />
   <Project Path="Povala.Shared/Povala.Shared.csproj" Id="b2ba3c2d-210c-4e12-bbd1-92d4331eb56a" />
 </Solution>

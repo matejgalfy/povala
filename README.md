@@ -12,6 +12,7 @@ The application uses a system of two roles:
    - Has access to the standard user view (`UserShell`).
    - Can see the visual map of the gym with all current boulders.
    - Upon clicking a boulder, the user can mark it as an **Ascent** or as a **Project**.
+   - Has a profile page with statistics: total boulders climbed, number of active projects and highest grade climbed.
 
 ### Project Structure
 - `Povala.Api/` - ASP.NET Core REST API. Handles data persistence (SQLite via Entity Framework Core), user authentication (Identity), and the logic for boulders, ascents, and projects.
@@ -30,5 +31,3 @@ The application uses a system of two roles:
 2. Set the `povala-app` project as the "Startup project".
 3. Compile and run the application on your desired emulator (Android, iOS) or as a local Windows application (Windows Machine).
 
-## Future Development
-- Climber's profile with statistics about projecting boulders at different grades.
