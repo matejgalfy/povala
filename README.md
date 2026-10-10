@@ -26,6 +26,9 @@ The application uses a system of two roles:
 2. Verify and apply database migrations using the command: `dotnet ef database update`.
 3. Run the API: `dotnet run`. The API will start and provide access to the endpoints and the database (`povala.db`).
 
+### Tests
+   - To run backend unit tests, run the following command: `dotnet test Povala.Api.Tests`
+
 ### Frontend (povala-app)
 1. Open the `.sln` solution in Visual Studio.
 2. Set the `povala-app` project as the "Startup project".
