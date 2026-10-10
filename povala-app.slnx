@@ -6,6 +6,7 @@
   <Project Path="povala-app/povala-app.csproj">
     <Deploy Solution="Debug|*" />
   </Project>
+  <Project Path="Povala.Api.Tests/Povala.Api.Tests.csproj" Id="3dd3ea71-7d84-4b57-a12e-18fb89241a2d" />
   <Project Path="Povala.Api/Povala.Api.csproj" />
   <Project Path="Povala.Shared/Povala.Shared.csproj" Id="b2ba3c2d-210c-4e12-bbd1-92d4331eb56a" />
 </Solution>
