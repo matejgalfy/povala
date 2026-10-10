@@ -5,7 +5,7 @@
              Title="">
     <VerticalStackLayout Padding="20" Spacing="20" VerticalOptions="Start">
         <Label 
-            Text="Admin Role"
+            Text="Admin Profile"
             FontSize="24"
             FontAttributes="Bold"
             HorizontalOptions="Center" />
