@@ -14,6 +14,31 @@ The application uses a system of two roles:
    - Upon clicking a boulder, the user can mark it as an **Ascent** or as a **Project**.
    - Has a profile page with statistics: total boulders climbed, number of active projects and highest grade climbed.
 
+### Screenshots
+
+<table>
+  <tr>
+    <td align="center"><b>Map Page</b></td>
+    <td align="center"><b>Profile Page</b></td>
+    <td align="center"><b>Boulder Actions</b></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="screenshots/map_page.png" width="250" alt="Map Page"></td>
+    <td align="center"><img src="screenshots/profile_page.png" width="250" alt="Profile Page"></td>
+    <td align="center"><img src="screenshots/boulder_actions.png" width="250" alt="Boulder Actions"></td>
+  </tr>
+</table>
+<table>
+  <tr>
+    <td align="center"><b>Add Boulder - Color (Owner)</b></td>
+    <td align="center"><b>Add Boulder - Difficulty (Owner)</b></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="screenshots/add_boulder_color.png" width="250" alt="Add Boulder - Color"></td>
+    <td align="center"><img src="screenshots/add_boulder_difficulty.png" width="250" alt="Add Boulder - Difficulty"></td>
+  </tr>
+</table>
+
 ### Project Structure
 - `Povala.Api/` - ASP.NET Core REST API. Handles data persistence (SQLite via Entity Framework Core), user authentication (Identity), and the logic for boulders, ascents, and projects.
 - `povala-app/` - .NET MAUI frontend application for mobile devices and desktop, separated into modules for the Owner and regular User.
